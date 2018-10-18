@@ -124,11 +124,6 @@ int main()
         coded_num[5] = 'G';
     }
 
-    for (int i = 0; i <= 5; ++i)
-    {
-        std::cout << coded_num[i];
-    }
-
     // Decides how to print out the final characters
     if (test_mode == 1)
     {
