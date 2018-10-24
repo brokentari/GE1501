@@ -4,12 +4,12 @@
 #include <thread>
 #include <chrono>
 
-char board_spaces[15] = {'+'};
+char board_spaces[16] = {'+'};
 int current_pos = 0;
 
-void fillArray(char str[15])
+void fillArray(char str[16])
 {
-    for (int i = 1; i < 15; i++)
+    for (int i = 1; i < 16; i++)
     {
         str[i] = '.';
     }
@@ -17,11 +17,11 @@ void fillArray(char str[15])
 
 void moveSpace(int steps)
 {
-    if (current_pos + steps > 14)
+    if (current_pos + steps > 15)
     {
         board_spaces[current_pos] = '.';
-        board_spaces[current_pos + steps - 15] = '+';
-        current_pos = current_pos + steps - 15;
+        board_spaces[current_pos + steps - 16] = '+';
+        current_pos = current_pos + steps - 16;
     }
     else
     {
@@ -33,33 +33,101 @@ void moveSpace(int steps)
 
 void printBoard()
 {
-    for (int i = 0; i < 15; i++)
+    for (int i = 0; i < 16; i++)
     {
         std::cout << board_spaces[i];
     }
-    std::cout << std::endl;
-    std::cout << std::endl;
+    std::cout << std::endl
+              << std::endl;
 }
 
-int main()
+void hard_mode()
 {
-    std::cout << std::endl;
-    std::cout << ("Welcome to The Ploy of the Jailor") << std::endl;
-    std::cout << std::endl;
+    int first_silver = rand() % 15 + 1;
+    int second_silver = rand() % 15 + 1;
 
-    /////////// Board Initialization ////////////////
-    int silver_coin = rand() % 14;
+    while (first_silver == second_silver)
+    {
+        first_silver = rand() % 15 + 1;
+        second_silver = rand() % 15 + 1;
+    }
+
     int winning_condition = 0;
+    int gold_coin;
 
     fillArray(board_spaces); // Fills board with periods
 
-    board_spaces[silver_coin] = 'x';
-    std::cout << ("The jailor has put their silver coin in space ");
-    std::cout << silver_coin + 1 << std::endl;
+    board_spaces[first_silver] = 'x';
+    std::cout << ("The jailor has put their first silver coin in space ") << first_silver << std::endl;
+
+    board_spaces[second_silver] = 'x';
+    std::cout << ("The jailor has put their second silver coin in space ") << second_silver << std::endl;
 
     printBoard();
 
+    std::cout << ("Enter your gold coin location:  ");
+    std::cin >> gold_coin;
+
+    board_spaces[gold_coin] = 's';
+
+    std::cout << ("Current board: ");
+    printBoard();
+    std::cout << std::endl;
+
+    while (winning_condition == 0) // As long at winning_conditions equals 0, the game continues
+    {
+        int dice_roll = rand() % 5 + 1;
+
+        std::cout << ("You rolled a  ") << dice_roll << ("!") << std::endl;
+        moveSpace(dice_roll);
+        std::cout << ("You are now in space ") << current_pos << std::endl;
+        printBoard();
+
+        if (current_pos == first_silver || current_pos == second_silver)
+        {
+            std::cout << ("You are now dragon food :(") << std::endl;
+            winning_condition = 1;
+        }
+        else if (current_pos == gold_coin)
+        {
+            std::cout << ("Congrulations! You've won freedom!") << std::endl;
+            winning_condition = 1;
+        }
+        else
+        {
+            int choice = rand() % 1 + 1;
+            if (choice == 1)
+            {
+                board_spaces[first_silver] = '.';
+                first_silver = rand() % 5 + 1;
+                board_spaces[first_silver] = 'x';
+                std::cout << ("The jailor has moved their first silver coin to space ") << first_silver << std::endl;
+            }
+            else if (choice == 2)
+            {
+                board_spaces[second_silver] = '.';
+                second_silver = rand() % 5 + 1;
+                board_spaces[second_silver] = 'x';
+                std::cout << ("The jailor has moved their second silver coin to space ") << second_silver << std::endl;
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
+}
+
+void easy_mode()
+{
+
+    int winning_condition = 0;
     int first_gold, second_gold;
+
+    fillArray(board_spaces); // Fills board with periods
+
+    int silver_coin = rand() % 15 + 1;
+    board_spaces[silver_coin] = 'x';
+    std::cout << ("The jailor has put their silver coin in space ") << silver_coin << std::endl;
+
+    printBoard();
 
     std::cout << ("enter your first gold coin location:  ");
     std::cin >> first_gold;
@@ -68,11 +136,8 @@ int main()
     std::cin >> second_gold;
     std::cout << std::endl;
 
-    board_spaces[first_gold - 1] = 's';
-    board_spaces[second_gold - 1] = 's';
-
-    first_gold = first_gold - 1;
-    second_gold = second_gold - 1;
+    board_spaces[first_gold] = 's';
+    board_spaces[second_gold] = 's';
 
     std::cout << ("Current board: ");
     printBoard();
@@ -82,32 +147,46 @@ int main()
 
     while (winning_condition == 0) // As long at winning_conditions equals 0, the game continues
     {
-        int dice_roll = rand() % 7 + 1;
+        int dice_roll = rand() % 5 + 1;
 
-        std::cout << ("Previous space: ") << current_pos + 1 << std::endl;
-
-        std::cout << ("You moved ") << dice_roll << (" spaces") << std::endl;
-
+        std::cout << ("You rolled a  ") << dice_roll << ("!") << std::endl;
         moveSpace(dice_roll);
-
-        std::cout << ("New space: ") << current_pos + 1 << std::endl;
-
+        std::cout << ("You are now in space ") << current_pos << std::endl;
         printBoard();
 
         if (current_pos == silver_coin)
         {
-            std::cout << ("loser") << std::endl;
+            std::cout << ("You are now dragon food :(") << std::endl;
             winning_condition = 1;
         }
-        if (current_pos == first_gold || current_pos == second_gold)
+        else if (current_pos == first_gold || current_pos == second_gold)
         {
-            std::cout << ("winner") << std::endl;
-            winning_condition = 2;
+            std::cout << ("Congrulations! You've won freedom!") << std::endl;
+            winning_condition = 1;
         }
-        else
-        {
-            winning_condition == 0;
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::this_thread::sleep_for(std::chrono::seconds(2)); // Wait 2 seconds
+    }
+}
+
+int main()
+{
+    int difficulty;
+    std::cout << std::endl
+              << ("Welcome to The Ploy of the Jailor") << std::endl
+              << std::endl
+              << ("Easy (1) mode or Hard (2) mode?  ");
+    std::cin >> difficulty;
+
+    if (difficulty == 1)
+    {
+        easy_mode();
+    }
+    else if (difficulty == 2)
+    {
+        hard_mode();
+    }
+    else
+    {
+        std::cout << ("Not a valid difficulty") << std::endl;
     }
 }
