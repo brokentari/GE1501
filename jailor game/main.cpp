@@ -54,6 +54,7 @@ void hard_mode()
 
     int winning_condition = 0;
     int gold_coin;
+    int choice = 1;
 
     fillArray(board_spaces); // Fills board with periods
 
@@ -64,9 +65,15 @@ void hard_mode()
     std::cout << ("The jailor has put their second silver coin in space ") << second_silver << std::endl;
 
     printBoard();
-
-    std::cout << ("Enter your gold coin location:  ");
-    std::cin >> gold_coin;
+    do
+    {
+        std::cout << ("Enter your gold coin location:  ");
+        std::cin >> gold_coin;
+        if ((gold_coin == first_silver) || (gold_coin == second_silver))
+        {
+            std::cout << ("Can't place your coin on the same space as either the jailor's coins. Try again") << std::endl;
+        }
+    } while ((gold_coin == first_silver) || (gold_coin == second_silver));
 
     board_spaces[gold_coin] = 's';
 
@@ -77,7 +84,6 @@ void hard_mode()
     while (winning_condition == 0) // As long at winning_conditions equals 0, the game continues
     {
         int dice_roll = rand() % 5 + 1;
-
         std::cout << ("You rolled a  ") << dice_roll << ("!") << std::endl;
         moveSpace(dice_roll);
         std::cout << ("You are now in space ") << current_pos << std::endl;
@@ -95,13 +101,13 @@ void hard_mode()
         }
         else
         {
-            int choice = rand() % 1 + 1;
             if (choice == 1)
             {
                 board_spaces[first_silver] = '.';
                 first_silver = rand() % 5 + 1;
                 board_spaces[first_silver] = 'x';
                 std::cout << ("The jailor has moved their first silver coin to space ") << first_silver << std::endl;
+                choice = 2;
             }
             else if (choice == 2)
             {
@@ -109,6 +115,7 @@ void hard_mode()
                 second_silver = rand() % 5 + 1;
                 board_spaces[second_silver] = 'x';
                 std::cout << ("The jailor has moved their second silver coin to space ") << second_silver << std::endl;
+                choice = 1;
             }
         }
         std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -129,12 +136,24 @@ void easy_mode()
 
     printBoard();
 
-    std::cout << ("enter your first gold coin location:  ");
-    std::cin >> first_gold;
+    do
+    {
+        std::cout << ("enter your first gold coin location:  ");
+        std::cin >> first_gold;
 
-    std::cout << ("enter your second gold coin location:  ");
-    std::cin >> second_gold;
-    std::cout << std::endl;
+        std::cout << ("enter your second gold coin location:  ");
+        std::cin >> second_gold;
+        std::cout << std::endl;
+
+        if (first_gold == silver_coin || second_gold == silver_coin)
+        {
+            std::cout << ("Can't place your coin on the same space as the jailor. Try again.") << std::endl;
+        }
+        else if (first_gold == second_gold)
+        {
+            std::cout << ("Can't place both your coin on the same place. Try again.") << std::endl;
+        }
+    } while ((first_gold == silver_coin || second_gold == silver_coin) || (first_gold == second_gold));
 
     board_spaces[first_gold] = 's';
     board_spaces[second_gold] = 's';
